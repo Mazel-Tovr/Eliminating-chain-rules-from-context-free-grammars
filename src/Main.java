@@ -5,7 +5,7 @@ public class Main {
 
         Grammar grammar = new Grammar();
         grammar.axiom = 'S';
-        grammar.size = 8;
+        grammar.size = 7;
         grammar.rules = new Rule[grammar.size];
 
         Rule[] rules = grammar.rules;
@@ -14,9 +14,9 @@ public class Main {
         rules[2] = new Rule('A', "aA");
         rules[3] = new Rule('A', "B");
         rules[4] = new Rule('B', "aSb");
-        rules[5] = new Rule('B', "S");
-        rules[6] = new Rule('F', "bc");
-        rules[7] = new Rule('F', "bFc");
+        //rules[5] = new Rule('B', "S");
+        rules[5] = new Rule('F', "bc");
+        rules[6] = new Rule('F', "bFc");
 
         System.out.println("This context-free grammar was entered:");
         printGrammar(grammar);
@@ -35,6 +35,14 @@ public class Main {
 
         System.out.println("Matrix representation of the chain rules:");
         printTable(index);
+
+        System.out.println("Table filling results (all the long chain substitutions are contracted):");
+        fillTable(index.table);
+        printTable(index);
+
+        System.out.println("An equivalent grammar without chain rules:");
+        printGrammarWithoutChains(grammar, index);
+
     }
 
 
@@ -195,5 +203,51 @@ public class Main {
             System.out.println();
         }
         System.out.println();
+    }
+
+    static void fillTable(Table matrix)
+    {
+
+        int size = matrix.size;
+        boolean[] table = matrix.table;
+        for (int i = 0; i < size; ++i)
+            for (int j = 0; j < size; ++j)
+                if (table[size * i + j])
+                    for (int k = 0; k < size; ++k)
+                        if (table[size * j + k])
+                            table[size * i + k] = true;
+
+        // clearing the main diagonal
+        // chain rules of the type A -> A are excluded
+        for (int i = 0; i < size; ++i)
+            table[size * i + i] = false;
+    }
+
+    static int printGrammarWithoutChains(Grammar grammar, Index index)
+    {
+        int size = index.cntNT;
+        char []strNT = index.strNT;
+        Rule[] rules = grammar.rules;
+
+        int[] startPos = index.startPos;
+        int[] chains = index.chains;
+        int[] nonChains = index.nonChains;
+        boolean[] table = index.table.table;
+
+        for (int i = 0; i < size; ++i) {
+            //if (chains[i] ) {
+                for (int j = 0; j < size; ++j)
+                    if (table[size * i + j])
+                        for (int k = startPos[j] + chains[j];
+                             k < startPos[j] + chains[j] + nonChains[j]; ++k)
+                            System.out.println(strNT[i]+" -> "+ rules[k].replace);
+           // }
+
+            for (int k = startPos[i] + chains[i];
+                 k < startPos[i] + chains[i] + nonChains[i]; ++k)
+                System.out.println(strNT[i]+" -> " + rules[k].replace);
+        }
+        System.out.println();;
+        return 0;
     }
 }
