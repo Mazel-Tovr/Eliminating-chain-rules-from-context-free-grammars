@@ -1,28 +1,30 @@
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
 
-        Grammar grammar = new Grammar();
-        grammar.axiom = 'S';
-        grammar.size = 7;
-        grammar.rules = new Rule[grammar.size];
+        char axiom='S';
 
-        Rule[] rules = grammar.rules;
-        rules[0] = new Rule('S', "aFb");
-        rules[1] = new Rule('S', "A");
-        rules[2] = new Rule('A', "aA");
-        rules[3] = new Rule('A', "B");
-        rules[4] = new Rule('B', "aSb");
-        //rules[5] = new Rule('B', "S");
-        rules[5] = new Rule('F', "bc");
-        rules[6] = new Rule('F', "bFc");
+
+        List<Rule> rules = new ArrayList<>();
+
+        rules.add( new Rule('S', "aFb"));
+        rules.add(new Rule('S', "A"));
+        rules.add(new Rule('A', "aA"));
+        rules.add(new Rule('A', "B"));
+        rules.add( new Rule('B', "aSb"));
+        rules.add(new Rule('B', "S"));
+        rules.add( new Rule('F', "bc"));
+        rules.add(new Rule('F', "bFc"));
+
+        Grammar grammar = new Grammar(axiom,rules);
 
         System.out.println("This context-free grammar was entered:");
         printGrammar(grammar);
 
         Index index = new Index();
-        index.table = new Table();
         presortGrammar(grammar,index);
 
         processGrammar(grammar,index);
@@ -37,7 +39,7 @@ public class Main {
         printTable(index);
 
         System.out.println("Table filling results (all the long chain substitutions are contracted):");
-        fillTable(index.table);
+        fillTable(index.getTable());
         printTable(index);
 
         System.out.println("An equivalent grammar without chain rules:");
@@ -47,31 +49,32 @@ public class Main {
 
 
     static void printGrammar(Grammar grammar) {
-        for (int i = 0; i < grammar.size; ++i) {
-            Rule rule = grammar.rules[i];
+        List<Rule> rules = grammar.getRules();
+        for (int i = 0; i < rules.size(); ++i) {
+            Rule rule = rules.get(i);
             System.out.println(rule.nt + " -> " + rule.replace);
         }
     }
 
-    static void  swap(Rule[]array,  int indexA, int indexB) {
-        Rule tmp = array[indexA];
-        array[indexA] = array[indexB];
-        array[indexB] = tmp;
-
+    static void  swap( List<Rule> list,  int indexA, int indexB) {
+        Rule tmp = list.get(indexA);
+        list.set(indexA, list.get(indexB));
+        list.set(indexB, tmp);
     }
 
 
     static void presortGrammar(Grammar grammar, Index index) {
-        char axiom = grammar.axiom;
-        int size = grammar.size;
-        Rule[] rules = grammar.rules;
+        char axiom = grammar.getAxiom();
+        List<Rule> rules = grammar.getRules();
+        int size = rules.size();
+
         int cntNT = 1;
 
         // searching for a rule which LHS is the axiom
-        if (rules[0].nt != axiom) {
+        if (rules.get(0).nt != axiom) {
             int i;
             for (i = 1; i < size; ++i)
-                if (rules[i].nt == axiom)
+                if (rules.get(i).nt == axiom)
                     break;
             if (i < size)
                 swap(rules,i , 0);
@@ -82,29 +85,29 @@ public class Main {
 
         char tmp = axiom;
         for (int i = 1; i < size; ++i) {
-            if (rules[i].nt != tmp) {
+            if (rules.get(i).nt != tmp) {
                 ++cntNT;
-                tmp = rules[i].nt;
+                tmp = rules.get(i).nt;
             }
             int j = i + 1;
-            while (j < size && rules[j].nt != tmp  )
+            while (j < size && rules.get(j).nt != tmp  )
                 ++j;
             if (j < size && j != i + 1)
                 swap(rules,i + 1, j);
         }
-        index.cntNT = cntNT;
+        index.setCntNT(cntNT);
 
     }
 
 
     static void  processGrammar(Grammar grammar, Index index)
     {
+        List<Rule> rules = grammar.getRules();
+        int size = rules.size();
 
-        int size = grammar.size;
-        Rule[] rules = grammar.rules;
-        int cntNT = index.cntNT;
+        int cntNT = index.getCntNT();
 
-        char [] strNT = new char[cntNT + 1];
+        char [] strNT = new char[cntNT];
 
         int []startPos =new int[cntNT];
 
@@ -113,13 +116,13 @@ public class Main {
         int []nonChains = new int[cntNT];
 
 
-        char tmp = rules[0].nt;
+        char tmp = rules.get(0).nt;
         int writePos = 0;
         int start = 0;
         int cntChains = 0;
         int cntNonChains = 0;
         for (int i = 0; i < size; ++i) {
-            if (rules[i].nt != tmp) {
+            if (rules.get(i).nt != tmp) {
                 strNT[writePos] = tmp;
                 startPos[writePos] = start;
                 start = i;
@@ -129,10 +132,10 @@ public class Main {
                 cntNonChains = 0;
 
                 ++writePos;
-                tmp = rules[i].nt;
+                tmp = rules.get(i).nt;
             }
 
-          String replace = rules[i].replace;
+          String replace = rules.get(i).replace;
             if (Character.isUpperCase(replace.charAt(0)) && replace.length() ==1) {
                 swap( rules,  start + cntChains,  i);
                 ++cntChains;
@@ -142,45 +145,47 @@ public class Main {
         }
         // calculations for the last non-terminal
         strNT[writePos] = tmp;
-        strNT[writePos + 1] = '\0';
+        //strNT[writePos + 1] = '\0';
         startPos[writePos] = start;
         chains[writePos] = cntChains;
         nonChains[writePos] = cntNonChains;
 
         // dumping the results
-        index.strNT = strNT;
-        index.startPos = startPos;
-        index.chains = chains;
-        index.nonChains = nonChains;
+        index.setStrNT(strNT);
+        index.setStartPos(startPos);
+        index.setChains(chains);
+        index.setNonChains(nonChains);
 
     }
 
     static int initTable(Grammar grammar, Index index)
     {
 
-        int cntNT = index.cntNT;
-        boolean []table = new boolean[cntNT*cntNT];//(bool *)calloc(cntNT * cntNT, sizeof(bool));
+        int cntNT = index.getCntNT();
+        boolean []table = new boolean[cntNT*cntNT];
+        boolean[][]table2 = new boolean[cntNT][cntNT];
 
-        index.table.table = table;
-        index.table.size = cntNT;
-        char[] strNT = index.strNT;
-        int[] startPos = index.startPos;
-        int[] chains = index.chains;
-        Rule[] rules = grammar.rules;
+        index.getTable().table = table;
+        index.getTable().size = cntNT;
+        char[] strNT = index.getStrNT();
+        int[] startPos = index.getStartPos();
+        int[] chains = index.getChains();
+        List<Rule> rules = grammar.getRules();
 
         for (int i = 0; i < cntNT; ++i)
             for (int k = startPos[i]; k < startPos[i] + chains[i]; ++k) {
-                int j = findPos(strNT, rules[k].replace.charAt(0));//TODO хз
+                int j = findPos(strNT, rules.get(k).replace.charAt(0));//TODO хз
                 // unproductive symbowls in chain rules are actually removed here.
-                if (j >= 0)
+                if (j >= 0) {
                     table[cntNT * i + j] = true;
+                    table2[i][j]=true;
+                }
             }
         return 0;
     }
 
     static int findPos(char[] str, char c)
     {
-
         for (int i = 0; i <str.length ; i++) {
             if(str[i] == c) return i;
         }
@@ -189,9 +194,9 @@ public class Main {
 
     static void printTable(Index index)
     {
-        int size = index.table.size;
-        boolean []table = index.table.table;
-        char []strNT = index.strNT;
+        int size = index.getTable().size;
+        boolean []table = index.getTable().table;
+        char []strNT = index.getStrNT();
         System.out.print("   ");
         for (int i = 0; i < size; ++i)
             System.out.print(strNT[i]+" ");
@@ -225,14 +230,14 @@ public class Main {
 
     static int printGrammarWithoutChains(Grammar grammar, Index index)
     {
-        int size = index.cntNT;
-        char []strNT = index.strNT;
-        Rule[] rules = grammar.rules;
+        int size = index.getCntNT();
+        char []strNT = index.getStrNT();
+        List<Rule> rules = grammar.getRules();
 
-        int[] startPos = index.startPos;
-        int[] chains = index.chains;
-        int[] nonChains = index.nonChains;
-        boolean[] table = index.table.table;
+        int[] startPos = index.getStartPos();
+        int[] chains = index.getChains();
+        int[] nonChains = index.getNonChains();
+        boolean[] table = index.getTable().table;
 
         for (int i = 0; i < size; ++i) {
             //if (chains[i] ) {
@@ -240,12 +245,12 @@ public class Main {
                     if (table[size * i + j])
                         for (int k = startPos[j] + chains[j];
                              k < startPos[j] + chains[j] + nonChains[j]; ++k)
-                            System.out.println(strNT[i]+" -> "+ rules[k].replace);
+                            System.out.println(strNT[i]+" -> "+ rules.get(k).replace);
            // }
 
             for (int k = startPos[i] + chains[i];
                  k < startPos[i] + chains[i] + nonChains[i]; ++k)
-                System.out.println(strNT[i]+" -> " + rules[k].replace);
+                System.out.println(strNT[i]+" -> " + rules.get(k).replace);
         }
         System.out.println();;
         return 0;
