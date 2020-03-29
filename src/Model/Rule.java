@@ -1,3 +1,5 @@
+package Model;
+
 public class Rule
 {
   private char nt; //non-terminal;

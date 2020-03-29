@@ -1,3 +1,5 @@
+package Model;
+
 public class Table
 {
    private int size;
