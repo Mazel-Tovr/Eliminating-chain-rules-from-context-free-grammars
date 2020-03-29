@@ -162,11 +162,9 @@ public class Main {
     {
 
         int cntNT = index.getCntNT();
-        boolean []table = new boolean[cntNT*cntNT];
-        boolean[][]table2 = new boolean[cntNT][cntNT];
+        boolean [][]table = new boolean[cntNT][cntNT];
 
-        index.getTable().table = table;
-        index.getTable().size = cntNT;
+
         char[] strNT = index.getStrNT();
         int[] startPos = index.getStartPos();
         int[] chains = index.getChains();
@@ -177,10 +175,11 @@ public class Main {
                 int j = findPos(strNT, rules.get(k).replace.charAt(0));//TODO хз
                 // unproductive symbowls in chain rules are actually removed here.
                 if (j >= 0) {
-                    table[cntNT * i + j] = true;
-                    table2[i][j]=true;
+                    table[i][j]=true;
                 }
             }
+        index.getTable().setTable(table);
+        index.getTable().setSize(cntNT);
         return 0;
     }
 
@@ -194,8 +193,8 @@ public class Main {
 
     static void printTable(Index index)
     {
-        int size = index.getTable().size;
-        boolean []table = index.getTable().table;
+        int size = index.getTable().getSize();
+        boolean [][]table = index.getTable().getTable();
         char []strNT = index.getStrNT();
         System.out.print("   ");
         for (int i = 0; i < size; ++i)
@@ -204,7 +203,7 @@ public class Main {
         for (int i = 0; i < size; ++i) {
             System.out.print(strNT[i]+"|" );
             for (int j = 0; j < size; ++j)
-                System.out.print(" "+(table[size * i + j]?1:0));
+                System.out.print(" "+(table[i][j]?1:0));
             System.out.println();
         }
         System.out.println();
@@ -213,19 +212,19 @@ public class Main {
     static void fillTable(Table matrix)
     {
 
-        int size = matrix.size;
-        boolean[] table = matrix.table;
+        int size = matrix.getSize();
+        boolean[][] table = matrix.getTable();
         for (int i = 0; i < size; ++i)
             for (int j = 0; j < size; ++j)
-                if (table[size * i + j])
+                if (table[ i][ j])
                     for (int k = 0; k < size; ++k)
-                        if (table[size * j + k])
-                            table[size * i + k] = true;
+                        if (table[ i][ j])
+                            table[ i][ j] = true;
 
         // clearing the main diagonal
         // chain rules of the type A -> A are excluded
         for (int i = 0; i < size; ++i)
-            table[size * i + i] = false;
+            table[i][i] = false;
     }
 
     static int printGrammarWithoutChains(Grammar grammar, Index index)
@@ -237,12 +236,12 @@ public class Main {
         int[] startPos = index.getStartPos();
         int[] chains = index.getChains();
         int[] nonChains = index.getNonChains();
-        boolean[] table = index.getTable().table;
+        boolean[][] table = index.getTable().getTable();
 
         for (int i = 0; i < size; ++i) {
             //if (chains[i] ) {
                 for (int j = 0; j < size; ++j)
-                    if (table[size * i + j])
+                    if (table[i][j])
                         for (int k = startPos[j] + chains[j];
                              k < startPos[j] + chains[j] + nonChains[j]; ++k)
                             System.out.println(strNT[i]+" -> "+ rules.get(k).replace);
