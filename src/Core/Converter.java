@@ -24,7 +24,6 @@ public class Converter
 
        printer.printGrammar("This context-free grammar was entered:",grammar);
 
-
        presortGrammar(grammar,index);
 
        processGrammar(grammar,index);
@@ -35,17 +34,23 @@ public class Converter
 
        initTable(grammar, index);
 
-
        printer.printTable("Matrix representation of the chain rules:",index);
 
        fillTable(index.getTable());
        printer.printTable("Model.Table filling results (all the long chain substitutions are contracted):",index);
 
-
        printer.printGrammarWithoutChains(grammar, index);
    }
 
-
+    /*Sort rules like:
+    S->aAb
+    A->bSa
+    S->A
+    --To--
+    S->A
+    S->aAb
+    A->bSa
+    */
     private void presortGrammar(Grammar grammar, Index index) {
         char axiom = grammar.getAxiom();
         List<Rule> rules = grammar.getRules();
@@ -78,11 +83,12 @@ public class Converter
             if (j < size && j != i + 1)
                 Util.swap(rules,i + 1, j);
         }
+        //set non terminals
         index.setCntNT(cntNT);
 
     }
 
-
+    //Finding chan rules and Fill index
     private void  processGrammar(Grammar grammar, Index index)
     {
         List<Rule> rules = grammar.getRules();
@@ -128,7 +134,6 @@ public class Converter
         }
         // calculations for the last non-terminal
         strNT[writePos] = tmp;
-        //strNT[writePos + 1] = '\0';
         startPos[writePos] = start;
         chains[writePos] = cntChains;
         nonChains[writePos] = cntNonChains;
@@ -141,12 +146,10 @@ public class Converter
 
     }
 
-    private int initTable(Grammar grammar, Index index)
+    private void initTable(Grammar grammar, Index index)
     {
-
         int cntNT = index.getCntNT();
         boolean [][]table = new boolean[cntNT][cntNT];
-
 
         char[] strNT = index.getStrNT();
         int[] startPos = index.getStartPos();
@@ -155,7 +158,7 @@ public class Converter
 
         for (int i = 0; i < cntNT; ++i)
             for (int k = startPos[i]; k < startPos[i] + chains[i]; ++k) {
-                int j = Util.findPos(strNT, rules.get(k).getTerminalString().charAt(0));//TODO хз
+                int j = Util.findPos(strNT, rules.get(k).getTerminalString().charAt(0));
                 // unproductive symbowls in chain rules are actually removed here.
                 if (j >= 0) {
                     table[i][j]=true;
@@ -163,14 +166,13 @@ public class Converter
             }
         index.getTable().setTable(table);
         index.getTable().setSize(cntNT);
-        return 0;
     }
 
 
 
 
 
-    static void fillTable(Table matrix)
+    private void fillTable(Table matrix)
     {
         int size = matrix.getSize();
         boolean[][] table = matrix.getTable();

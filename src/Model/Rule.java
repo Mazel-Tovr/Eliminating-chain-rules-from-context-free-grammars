@@ -3,7 +3,7 @@ package Model;
 public class Rule
 {
   private char nt; //non-terminal;
-  private   String terminalString;
+  private  String terminalString;
 
   public Rule(char nt, String terminalString) {
     this.nt = nt;

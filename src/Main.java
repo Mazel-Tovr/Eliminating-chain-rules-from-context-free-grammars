@@ -1,8 +1,7 @@
 import Core.Converter;
 import Model.Grammar;
-import Model.Index;
 import Model.Rule;
-import Model.Table;
+import Parser.FileParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +26,16 @@ public class Main {
         Grammar grammar = new Grammar(axiom,rules);
 
         Converter converter = new Converter(grammar);
-        converter.eliminateChanRules();
+      //  converter.eliminateChanRules();
 
+        FileParser fileParser = new FileParser();
+        try {
+            converter = new Converter(fileParser.getGrammar("D:\\GitHub\\Eliminating-chain-rules-from-context-free-grammars\\testRulesInput2.txt"));
+            converter.eliminateChanRules();
+        }catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
 
     }
 
