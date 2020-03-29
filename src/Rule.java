@@ -1,10 +1,18 @@
 public class Rule
 {
-  public char nt; //non-terminal;
-  public  String replace;
+  private char nt; //non-terminal;
+  private   String terminalString;
 
-  public Rule(char nt, String replace) {
+  public Rule(char nt, String terminalString) {
     this.nt = nt;
-    this.replace = replace;
+    this.terminalString = terminalString;
+  }
+
+  public char getNt() {
+    return nt;
+  }
+
+  public String getTerminalString() {
+    return terminalString;
   }
 }

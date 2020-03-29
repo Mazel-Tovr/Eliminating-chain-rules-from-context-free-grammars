@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class Main {
         List<Rule> rules = grammar.getRules();
         for (int i = 0; i < rules.size(); ++i) {
             Rule rule = rules.get(i);
-            System.out.println(rule.nt + " -> " + rule.replace);
+            System.out.println(rule.getNt() + " -> " + rule.getTerminalString());
         }
     }
 
@@ -71,10 +70,10 @@ public class Main {
         int cntNT = 1;
 
         // searching for a rule which LHS is the axiom
-        if (rules.get(0).nt != axiom) {
+        if (rules.get(0).getNt() != axiom) {
             int i;
             for (i = 1; i < size; ++i)
-                if (rules.get(i).nt == axiom)
+                if (rules.get(i).getNt() == axiom)
                     break;
             if (i < size)
                 swap(rules,i , 0);
@@ -85,12 +84,12 @@ public class Main {
 
         char tmp = axiom;
         for (int i = 1; i < size; ++i) {
-            if (rules.get(i).nt != tmp) {
+            if (rules.get(i).getNt() != tmp) {
                 ++cntNT;
-                tmp = rules.get(i).nt;
+                tmp = rules.get(i).getNt();
             }
             int j = i + 1;
-            while (j < size && rules.get(j).nt != tmp  )
+            while (j < size && rules.get(j).getNt() != tmp  )
                 ++j;
             if (j < size && j != i + 1)
                 swap(rules,i + 1, j);
@@ -116,13 +115,13 @@ public class Main {
         int []nonChains = new int[cntNT];
 
 
-        char tmp = rules.get(0).nt;
+        char tmp = rules.get(0).getNt();
         int writePos = 0;
         int start = 0;
         int cntChains = 0;
         int cntNonChains = 0;
         for (int i = 0; i < size; ++i) {
-            if (rules.get(i).nt != tmp) {
+            if (rules.get(i).getNt() != tmp) {
                 strNT[writePos] = tmp;
                 startPos[writePos] = start;
                 start = i;
@@ -132,16 +131,16 @@ public class Main {
                 cntNonChains = 0;
 
                 ++writePos;
-                tmp = rules.get(i).nt;
+                tmp = rules.get(i).getNt();
             }
 
-          String replace = rules.get(i).replace;
+            String replace = rules.get(i).getTerminalString();
             if (Character.isUpperCase(replace.charAt(0)) && replace.length() ==1) {
                 swap( rules,  start + cntChains,  i);
                 ++cntChains;
             }
-        else
-            ++cntNonChains;
+            else
+                ++cntNonChains;
         }
         // calculations for the last non-terminal
         strNT[writePos] = tmp;
@@ -172,7 +171,7 @@ public class Main {
 
         for (int i = 0; i < cntNT; ++i)
             for (int k = startPos[i]; k < startPos[i] + chains[i]; ++k) {
-                int j = findPos(strNT, rules.get(k).replace.charAt(0));//TODO хз
+                int j = findPos(strNT, rules.get(k).getTerminalString().charAt(0));//TODO хз
                 // unproductive symbowls in chain rules are actually removed here.
                 if (j >= 0) {
                     table[i][j]=true;
@@ -188,7 +187,7 @@ public class Main {
         for (int i = 0; i <str.length ; i++) {
             if(str[i] == c) return i;
         }
-     return -1;
+        return -1;
     }
 
     static void printTable(Index index)
@@ -218,8 +217,8 @@ public class Main {
             for (int j = 0; j < size; ++j)
                 if (table[ i][ j])
                     for (int k = 0; k < size; ++k)
-                        if (table[ i][ j])
-                            table[ i][ j] = true;
+                        if (table[ j][ k])
+                            table[ i][ k] = true;
 
         // clearing the main diagonal
         // chain rules of the type A -> A are excluded
@@ -227,7 +226,7 @@ public class Main {
             table[i][i] = false;
     }
 
-    static int printGrammarWithoutChains(Grammar grammar, Index index)
+    static void printGrammarWithoutChains(Grammar grammar, Index index)
     {
         int size = index.getCntNT();
         char []strNT = index.getStrNT();
@@ -239,19 +238,16 @@ public class Main {
         boolean[][] table = index.getTable().getTable();
 
         for (int i = 0; i < size; ++i) {
-            //if (chains[i] ) {
-                for (int j = 0; j < size; ++j)
-                    if (table[i][j])
-                        for (int k = startPos[j] + chains[j];
-                             k < startPos[j] + chains[j] + nonChains[j]; ++k)
-                            System.out.println(strNT[i]+" -> "+ rules.get(k).replace);
-           // }
+            for (int j = 0; j < size; ++j)
+                if (table[i][j])
+                    for (int k = startPos[j] + chains[j];
+                         k < startPos[j] + chains[j] + nonChains[j]; ++k)
+                        System.out.println(strNT[i]+" -> "+ rules.get(k).getTerminalString());
 
             for (int k = startPos[i] + chains[i];
                  k < startPos[i] + chains[i] + nonChains[i]; ++k)
-                System.out.println(strNT[i]+" -> " + rules.get(k).replace);
+                System.out.println(strNT[i]+" -> " + rules.get(k).getTerminalString());
         }
         System.out.println();;
-        return 0;
     }
 }
