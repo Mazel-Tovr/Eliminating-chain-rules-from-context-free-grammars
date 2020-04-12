@@ -6,27 +6,35 @@ import Model.Rule;
 import Model.Table;
 import Printer.Printer;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class Converter
 {
+    private String FILE_PATH = "outPutResult.txt";
     private Grammar grammar;
     private Index index;
 
+    public Converter( Grammar grammar , String FILE_PATH ) {
+        this.grammar = grammar;
+        index = new Index();
+        this.FILE_PATH = FILE_PATH.isEmpty() ? this.FILE_PATH : FILE_PATH;
+    }
     public Converter( Grammar grammar) {
         this.grammar = grammar;
         index = new Index();
     }
+   public void eliminateChanRules() throws IOException {
 
-   public void eliminateChanRules()
-   {
-       Printer printer = new Printer();
+       Printer printer = new Printer(FILE_PATH);
 
        printer.printGrammar("This context-free grammar was entered:",grammar);
 
        presortGrammar(grammar,index);
 
-       processGrammar(grammar,index);
+       searchingForChainRules(grammar,index);
 
        System.out.println();
 
@@ -40,6 +48,7 @@ public class Converter
        printer.printTable("Model.Table filling results (all the long chain substitutions are contracted):",index);
 
        printer.printGrammarWithoutChains(grammar, index);
+       printer.flush();
    }
 
     /*Sort rules like:
@@ -89,7 +98,7 @@ public class Converter
     }
 
     //Finding chan rules and Fill index
-    private void  processGrammar(Grammar grammar, Index index)
+    private void searchingForChainRules(Grammar grammar, Index index)
     {
         List<Rule> rules = grammar.getRules();
         int size = rules.size();
@@ -146,6 +155,7 @@ public class Converter
 
     }
 
+    //Int chain rules table
     private void initTable(Grammar grammar, Index index)
     {
         int cntNT = index.getCntNT();
@@ -159,7 +169,7 @@ public class Converter
         for (int i = 0; i < cntNT; ++i)
             for (int k = startPos[i]; k < startPos[i] + chains[i]; ++k) {
                 int j = Util.findPos(strNT, rules.get(k).getTerminalString().charAt(0));
-                // unproductive symbowls in chain rules are actually removed here.
+                // unproductive symbols in chain rules are actually removed here.
                 if (j >= 0) {
                     table[i][j]=true;
                 }
@@ -171,7 +181,7 @@ public class Converter
 
 
 
-
+    //add into table rules that linked with pref rules (like recurs)
     private void fillTable(Table matrix)
     {
         int size = matrix.getSize();

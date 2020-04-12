@@ -4,6 +4,7 @@ import Model.Rule;
 import Parser.FileParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -23,18 +24,18 @@ public class Main {
         rules.add( new Rule('F', "bc"));
         rules.add(new Rule('F', "bFc"));
 
-        Grammar grammar = new Grammar(axiom,rules);
+       // Grammar grammar = new Grammar(axiom,rules);
 
-        Converter converter = new Converter(grammar);
-      //  converter.eliminateChanRules();
+        //Converter converter = new Converter(grammar);
+       // converter.eliminateChanRules();
 
         FileParser fileParser = new FileParser();
         try {
-            converter = new Converter(fileParser.getGrammar("D:\\GitHub\\Eliminating-chain-rules-from-context-free-grammars\\testRulesInput2.txt"));
+            Converter converter = new Converter(fileParser.getGrammar("D:\\GitHub\\Eliminating-chain-rules-from-context-free-grammars\\testRulesInput3.txt"));
             converter.eliminateChanRules();
         }catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            System.out.println(Arrays.toString(e.getStackTrace()));
         }
 
     }

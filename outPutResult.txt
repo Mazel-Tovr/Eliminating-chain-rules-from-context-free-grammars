@@ -1,0 +1,65 @@
+This context-free grammar was entered:
+S -> AB
+S -> B
+S -> SS
+S -> a
+A -> B
+A -> aDD
+B -> A
+B -> ba
+C -> ba
+C -> bB
+D -> Sb
+D -> aDS
+D -> C
+
+The grammar after re-ordering:
+S -> B
+S -> AB
+S -> SS
+S -> a
+A -> B
+A -> aDD
+B -> A
+B -> ba
+C -> ba
+C -> bB
+D -> C
+D -> aDS
+D -> Sb
+
+Matrix representation of the chain rules:
+  
+S A B C D 
+S| 0 0 1 0 0
+A| 0 0 1 0 0
+B| 0 1 0 0 0
+C| 0 0 0 0 0
+D| 0 0 0 1 0
+
+Model.Table filling results (all the long chain substitutions are contracted):
+  
+S A B C D 
+S| 0 1 1 0 0
+A| 0 0 1 0 0
+B| 0 1 0 0 0
+C| 0 0 0 0 0
+D| 0 0 0 1 0
+
+An equivalent grammar without chain rules:
+S -> aDD
+S -> ba
+S -> AB
+S -> SS
+S -> a
+A -> ba
+A -> aDD
+B -> aDD
+B -> ba
+C -> ba
+C -> bB
+D -> ba
+D -> bB
+D -> aDS
+D -> Sb
+
