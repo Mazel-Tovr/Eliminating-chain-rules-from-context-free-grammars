@@ -41,14 +41,14 @@ public class Converter
        printer.printGrammar("The grammar after re-ordering:",grammar);
 
        initTable(grammar, index);
-
        printer.printTable("Matrix representation of the chain rules:",index);
 
        fillTable(index.getTable());
        printer.printTable("Model.Table filling results (all the long chain substitutions are contracted):",index);
 
        printer.printGrammarWithoutChains(grammar, index);
-       printer.flush();
+
+       printer.flush();//write all into file
    }
 
     /*Sort rules like:
@@ -120,6 +120,7 @@ public class Converter
         int cntChains = 0;
         int cntNonChains = 0;
         for (int i = 0; i < size; ++i) {
+            //if new nonterminal
             if (rules.get(i).getNt() != tmp) {
                 strNT[writePos] = tmp;
                 startPos[writePos] = start;
@@ -134,6 +135,7 @@ public class Converter
             }
 
             String replace = rules.get(i).getTerminalString();
+            //if nonT go upper
             if (Character.isUpperCase(replace.charAt(0)) && replace.length() ==1) {
                 Util.swap( rules,  start + cntChains,  i);
                 ++cntChains;
@@ -168,7 +170,7 @@ public class Converter
 
         for (int i = 0; i < cntNT; ++i)
             for (int k = startPos[i]; k < startPos[i] + chains[i]; ++k) {
-                int j = Util.findPos(strNT, rules.get(k).getTerminalString().charAt(0));
+                int j = rules.get(k).getTerminalString().length() == 1 ? Util.findPos(strNT, rules.get(k).getTerminalString().charAt(0)) : -1;
                 // unproductive symbols in chain rules are actually removed here.
                 if (j >= 0) {
                     table[i][j]=true;
@@ -188,10 +190,10 @@ public class Converter
         boolean[][] table = matrix.getTable();
         for (int i = 0; i < size; ++i)
             for (int j = 0; j < size; ++j)
-                if (table[ i][ j])
+                if (table[i][j])
                     for (int k = 0; k < size; ++k)
-                        if (table[ j][ k])
-                            table[ i][ k] = true;
+                        if (table[j][k])
+                            table[i][k] = true;
 
         // clearing the main diagonal
         // chain rules of the type A -> A are excluded

@@ -3,6 +3,7 @@ package Model;
 import java.util.List;
 
 public class Grammar {
+
    private char axiom;
    private List<Rule> rules;
 

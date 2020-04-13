@@ -14,10 +14,10 @@ public class Util
     }
 
     //find position of letter in char array (non terminal)
-    static int findPos(char[] str, char c)
+    static int findPos(char[] strNt, char c)
     {
-        for (int i = 0; i <str.length ; i++) {
-            if(str[i] == c) return i;
+        for (int i = 0; i <strNt.length ; i++) {
+            if(strNt[i] == c) return i;
         }
         return -1;
     }

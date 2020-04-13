@@ -4,7 +4,6 @@ import Model.Grammar;
 import Model.Index;
 import Model.Rule;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +34,7 @@ public class Printer {
         boolean [][]table = index.getTable().getTable();
         char []strNT = index.getStrNT();
         System.out.print("   ");
-        fileWriter.write("  "+"\n");
+        fileWriter.write("   ");
         for (int i = 0; i < size; ++i) {
             System.out.print(strNT[i] + " ");
             fileWriter.write(strNT[i] + " ");
