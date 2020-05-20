@@ -20,7 +20,7 @@ public class Converter
     public Converter( Grammar grammar , String FILE_PATH ) {
         this.grammar = grammar;
         index = new Index();
-        this.FILE_PATH = FILE_PATH.isEmpty() ? this.FILE_PATH : FILE_PATH;
+        this.FILE_PATH = FILE_PATH.isEmpty() ? this.FILE_PATH : FILE_PATH+"/"+this.FILE_PATH;
     }
     public Converter( Grammar grammar) {
         this.grammar = grammar;
