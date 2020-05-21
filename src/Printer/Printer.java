@@ -6,7 +6,10 @@ import Model.Rule;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Printer {
 
@@ -58,6 +61,8 @@ public class Printer {
 
         System.out.println("An equivalent grammar without chain rules:");
         fileWriter.write("An equivalent grammar without chain rules:"+"\n");
+        Set<String> resultSet = new TreeSet<>();
+
         int size = index.getCntNT();
         char []strNT = index.getStrNT();
         List<Rule> rules = grammar.getRules();
@@ -72,16 +77,29 @@ public class Printer {
                 if (table[i][j])
                     for (int k = startPos[j] + chains[j];
                          k < startPos[j] + chains[j] + nonChains[j]; ++k){
-                        System.out.println(strNT[i]+" -> "+ rules.get(k).getTerminalString());
-                        fileWriter.write(strNT[i]+" -> "+ rules.get(k).getTerminalString()+"\n"); //mb switch
+                        resultSet.add(strNT[i]+" -> "+ rules.get(k).getTerminalString());
+//                        System.out.println(strNT[i]+" -> "+ rules.get(k).getTerminalString());
+//                        fileWriter.write(strNT[i]+" -> "+ rules.get(k).getTerminalString()+"\n"); //mb switch
                     }
 
             for (int k = startPos[i] + chains[i];
                  k < startPos[i] + chains[i] + nonChains[i]; ++k) {
-                System.out.println(strNT[i] + " -> " + rules.get(k).getTerminalString());
-                fileWriter.write(strNT[i] + " -> " + rules.get(k).getTerminalString()+"\n");
+                resultSet.add(strNT[i] + " -> " + rules.get(k).getTerminalString());
+//                System.out.println(strNT[i] + " -> " + rules.get(k).getTerminalString());
+//                fileWriter.write(strNT[i] + " -> " + rules.get(k).getTerminalString()+"\n");
             }
         }
+
+        //for a beautiful output
+        for (char c : strNT) {
+            for (String e : resultSet) {
+                if (c == e.charAt(0)) {
+                    fileWriter.write(e + "\n");
+                    System.out.println(e);
+                }
+            }
+        }
+
         fileWriter.write("\n");
         System.out.println();;
     }

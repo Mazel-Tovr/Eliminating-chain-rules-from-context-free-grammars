@@ -1,47 +1,26 @@
 This context-free grammar was entered:
-S -> aFb
 S -> A
-A -> aA
-A -> B
-B -> aSb
-B -> S
-F -> bc
-F -> bFc
+S -> a
+A -> S
+A -> a
 
 The grammar after re-ordering:
 S -> A
-S -> aFb
-A -> B
-A -> aA
-B -> S
-B -> aSb
-F -> bc
-F -> bFc
+S -> a
+A -> S
+A -> a
 
 Matrix representation of the chain rules:
-   S A B F 
-S| 0 1 0 0
-A| 0 0 1 0
-B| 1 0 0 0
-F| 0 0 0 0
+   S A 
+S| 0 1
+A| 1 0
 
 Model.Table filling results (all the long chain substitutions are contracted):
-   S A B F 
-S| 0 1 1 0
-A| 1 0 1 0
-B| 1 1 0 0
-F| 0 0 0 0
+   S A 
+S| 0 1
+A| 1 0
 
 An equivalent grammar without chain rules:
-S -> aA
-S -> aSb
-S -> aFb
-A -> aFb
-A -> aSb
-A -> aA
-B -> aFb
-B -> aA
-B -> aSb
-F -> bc
-F -> bFc
+S -> a
+A -> a
 
